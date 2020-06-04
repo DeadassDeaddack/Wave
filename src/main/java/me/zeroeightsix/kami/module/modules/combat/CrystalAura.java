@@ -38,8 +38,8 @@ import java.util.stream.Collectors;
 import static me.zeroeightsix.kami.util.EntityUtil.calculateLookAt;
 
 /**
- * Created by 086 on 28/12/2017.
- * Updated 3 December 2019 by hub
+ * Created by Optainable on 5/6/2020 
+ * jk idk how to code
  */
 @Module.Info(name = "CrystalAura", category = Module.Category.COMBAT)
 public class CrystalAura extends Module {
@@ -57,7 +57,6 @@ public class CrystalAura extends Module {
     private Entity renderEnt;
     private long systemTime = -1;
     private static boolean togglePitch = false;
-	// we need this cooldown to not place from old hotbar slot, before we have switched to crystals
     private boolean switchCooldown = false;
     private boolean isAttacking = false;
     private int oldSlot = -1;
@@ -71,15 +70,15 @@ public class CrystalAura extends Module {
                 .min(Comparator.comparing(c -> mc.player.getDistance(c)))
                 .orElse(null);
         if (explode.getValue() && crystal != null && mc.player.getDistance(crystal) <= range.getValue()) {
-            //Added delay to stop ncp from flagging "hitting too fast"
+        
             if (((System.nanoTime() / 1000000) - systemTime) >= 250) {
                 if (antiWeakness.getValue() && mc.player.isPotionActive(MobEffects.WEAKNESS)) {
                     if (!isAttacking) {
-                        // save initial player hand
+                     
                         oldSlot = Wrapper.getPlayer().inventory.currentItem;
                         isAttacking = true;
                     }
-                    // search for sword and tools in hotbar
+                    
                     newSlot = -1;
                     for (int i = 0; i < 9; i++) {
                         ItemStack stack = Wrapper.getPlayer().inventory.getStackInSlot(i);
@@ -95,7 +94,7 @@ public class CrystalAura extends Module {
                             break;
                         }
                     }
-                    // check if any swords or tools were found
+                
                     if (newSlot != -1) {
                         Wrapper.getPlayer().inventory.currentItem = newSlot;
                         switchCooldown = true;
@@ -154,8 +153,7 @@ public class CrystalAura extends Module {
                 double d = calculateDamage(blockPos.x + .5, blockPos.y + 1, blockPos.z + .5, entity);
                 if (d > damage) {
                     double self = calculateDamage(blockPos.x + .5, blockPos.y + 1, blockPos.z + .5, mc.player);
-                    // If this deals more damage to ourselves than it does to our target, continue. This is only ignored if the crystal is sure to kill our target but not us.
-                    // Also continue if our crystal is going to hurt us.. alot
+                    
                     if ((self > d && !(d < ((EntityLivingBase) entity).getHealth())) || self - .5 > mc.player.getHealth()) {
                         continue;
                     }
@@ -190,15 +188,15 @@ public class CrystalAura extends Module {
             } else {
                 f = result.sideHit;
             }
-            // return after we did an autoswitch
+          
             if (switchCooldown) {
                 switchCooldown = false;
                 return;
             }
-            //mc.playerController.processRightClickBlock(mc.player, mc.world, q, f, new Vec3d(0, 0, 0), EnumHand.MAIN_HAND);
+            
             mc.player.connection.sendPacket(new CPacketPlayerTryUseItemOnBlock(q, f, offhand ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND, 0, 0, 0));
         }
-        //this sends a constant packet flow for default packets
+        
         if (isSpoofingAngles) {
             if (togglePitch) {
                 mc.player.rotationPitch += 0.0004;
@@ -277,8 +275,7 @@ public class CrystalAura extends Module {
         double v = (1.0D - distancedsize) * blockDensity;
         float damage = (float) ((int) ((v * v + v) / 2.0D * 7.0D * (double) doubleExplosionSize + 1.0D));
         double finald = 1;
-        /*if (entity instanceof EntityLivingBase)
-            finald = getBlastReduction((EntityLivingBase) entity,getDamageMultiplied(damage));*/
+
         if (entity instanceof EntityLivingBase) {
             finald = getBlastReduction((EntityLivingBase) entity, getDamageMultiplied(damage), new Explosion(mc.world, null, posX, posY, posZ, 6F, false, true));
         }
@@ -315,13 +312,13 @@ public class CrystalAura extends Module {
         return calculateDamage(crystal.posX, crystal.posY, crystal.posZ, entity);
     }
 
-    //Better Rotation Spoofing System:
+
 
     private static boolean isSpoofingAngles;
     private static double yaw;
     private static double pitch;
 
-    //this modifies packets being sent so no extra ones are made. NCP used to flag with "too many packets"
+   
     private static void setYawAndPitch(float yaw1, float pitch1) {
         yaw = yaw1;
         pitch = pitch1;
